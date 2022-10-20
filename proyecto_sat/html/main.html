@@ -1,0 +1,358 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>main</title><meta name="generator" content="MATLAB 9.10"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-12-07"><meta name="DC.source" content="main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%Esteban C&aacute;rdenas</span>
+
+<span class="comment">%creamos los astros</span>
+<span class="comment">%nombre,masa,radio</span>
+<span class="comment">%masa en</span>
+Tierra=Astro(<span class="string">'Tierra'</span>,5.9736E+24,6.371)
+Apolo=Astro(<span class="string">'Apolo1'</span>,2155,.1)
+
+<span class="comment">%%===================definimos la orbita del Geostatica====================</span>
+<span class="comment">%initial conditions</span>
+<span class="comment">%get planet parameters</span>
+
+<span class="comment">%space station</span>
+altitude=35.786 <span class="comment">%meter</span>
+x0=Tierra.radio+altitude
+y0=0
+z0=0
+xdot0=0
+inclination=pi/2-23.5*pi/180;
+semi_eje=norm([x0;y0;z0])
+periodo= 2*pi/sqrt(Tierra.mu)*semi_eje^(3/2)
+
+vcircular=((2*pi*semi_eje*1000)/periodo)/1000         <span class="comment">%(2*pi*semi_eje*1000)/periodo%sqrt(Tierra.mu/semi_eje)</span>
+ydot0=vcircular*sin(inclination);
+zdot0=vcircular*cos(inclination)
+<span class="comment">%condiciones iniciales</span>
+estado_inicial=[x0;y0;z0;xdot0;ydot0;zdot0];
+
+
+<span class="comment">% need time window</span>
+
+<span class="comment">%period= 2*pi/sqrt(Tierra.mu)*semi_eje^(3/2)</span>
+number_of_orbits=1;
+tspan=[0 period*number_of_orbits]
+
+<span class="comment">%this is where we integrate the ecuation of motion</span>
+[tout,stateout]=ode45(@FuncResolver, tspan,estado_inicial);
+<span class="comment">%extract the state vector</span>
+xout=stateout(:,1)
+yout=stateout(:,2)
+zout=stateout(:,3)
+
+
+<span class="comment">%make earth</span>
+
+<span class="comment">%plot 3D orbit</span>
+fig=figure()
+set(fig,<span class="string">'color'</span>,<span class="string">'white'</span>)
+plot3(xout,yout,zout,<span class="string">'b-'</span>,<span class="string">'LineWidth'</span>,2)
+grid <span class="string">on</span>
+xlabel(<span class="string">'x-axis'</span>)
+ylabel(<span class="string">'y-axis'</span>)
+zlabel(<span class="string">'z-axis'</span>)
+hold <span class="string">on</span>
+
+
+axis <span class="string">equal</span>
+axis([-60 60 -60 60 -40 40])
+
+
+
+<span class="comment">%definimos la tierra</span>
+[x y z]= sphere
+r=Tierra.radio
+s=surf(r*x,r*y,r*z);
+direction=[1,0,0];
+rotate(s,direction,23.5)
+xlabel(<span class="string">'x-axis'</span>)
+ylabel(<span class="string">'y-axis'</span>)
+zlabel(<span class="string">'z-axis'</span>)
+
+<span class="comment">%definimos satelite 1</span>
+[x1 y1 z1]= sphere
+r=2
+s1=surf(xout(1)+r*x1,yout(1)+r*y1,zout(1)+r*z1, <span class="string">'FaceColor'</span>, [0.5 0.5 0.5]);
+<span class="comment">%definimos satelite 2</span>
+[x2 y2 z2]= sphere
+r2=2
+s2=surf(xout(68)+r2*x2,yout(68)+r2*y2,zout(68)+r2*z2, <span class="string">'FaceColor'</span>, [0.5 0.5 0.5]);
+<span class="comment">%definimos satelite 3</span>
+[x3 y3 z3]= sphere
+r3=2
+s3=surf(xout(78)+r3*x2,yout(78)+r3*y2,zout(78)+r3*z2, <span class="string">'FaceColor'</span>, [0.5 0.5 0.5]);
+<span class="comment">%definimos satelite 4</span>
+[x4 y4 z4]= sphere
+r4=2
+s4=surf(xout(88)+r4*x2,yout(88)+r4*y2,zout(88)+r4*z2, <span class="string">'FaceColor'</span>, [0.5 0.5 0.5]);
+
+<span class="comment">%for i=1:length(xout)</span>
+<span class="comment">%    s=surf(xout(i)+r*x,yout(i)+r*y,zout(i)+r*z);</span>
+<span class="comment">%    pause(.05)</span>
+<span class="comment">%end</span>
+</pre><pre class="codeoutput">
+G =
+
+   6.6700e-11
+
+
+obj = 
+
+  struct with fields:
+
+    nombre: 'Tierra'
+      masa: 5.9736e+24
+     radio: 6.3710
+        mu: 3.9844e+14
+
+
+Tierra = 
+
+  struct with fields:
+
+    nombre: 'Tierra'
+      masa: 5.9736e+24
+     radio: 6.3710
+        mu: 3.9844e+14
+
+
+G =
+
+   6.6700e-11
+
+
+obj = 
+
+  struct with fields:
+
+    nombre: 'Apolo1'
+      masa: 2155
+     radio: 0.1000
+        mu: 1.4374e-07
+
+
+Apolo = 
+
+  struct with fields:
+
+    nombre: 'Apolo1'
+      masa: 2155
+     radio: 0.1000
+        mu: 1.4374e-07
+
+
+altitude =
+
+   35.7860
+
+
+x0 =
+
+   42.1570
+
+
+y0 =
+
+     0
+
+
+z0 =
+
+     0
+
+
+xdot0 =
+
+     0
+
+
+semi_eje =
+
+   42.1570
+
+
+periodo =
+
+   8.6160e-05
+
+
+vcircular =
+
+   3.0743e+06
+
+
+zdot0 =
+
+   1.2259e+06
+
+</pre><pre class="codeoutput error">Unrecognized function or variable 'period'.
+
+Error in main (line 34)
+tspan=[0 period*number_of_orbits]
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Esteban Cárdenas
+
+%creamos los astros
+%nombre,masa,radio
+%masa en 
+Tierra=Astro('Tierra',5.9736E+24,6.371)
+Apolo=Astro('Apolo1',2155,.1)
+
+%%===================definimos la orbita del Geostatica====================
+%initial conditions
+%get planet parameters
+
+%space station
+altitude=35.786 %meter
+x0=Tierra.radio+altitude
+y0=0
+z0=0
+xdot0=0
+inclination=pi/2-23.5*pi/180;
+semi_eje=norm([x0;y0;z0])
+periodo= 2*pi/sqrt(Tierra.mu)*semi_eje^(3/2)
+
+vcircular=((2*pi*semi_eje*1000)/periodo)/1000         %(2*pi*semi_eje*1000)/periodo%sqrt(Tierra.mu/semi_eje)
+ydot0=vcircular*sin(inclination);
+zdot0=vcircular*cos(inclination)
+%condiciones iniciales
+estado_inicial=[x0;y0;z0;xdot0;ydot0;zdot0];
+
+
+% need time window
+
+%period= 2*pi/sqrt(Tierra.mu)*semi_eje^(3/2)
+number_of_orbits=1;
+tspan=[0 period*number_of_orbits]
+
+%this is where we integrate the ecuation of motion
+[tout,stateout]=ode45(@FuncResolver, tspan,estado_inicial);
+%extract the state vector
+xout=stateout(:,1)
+yout=stateout(:,2)
+zout=stateout(:,3)
+
+
+%make earth
+
+%plot 3D orbit
+fig=figure()
+set(fig,'color','white')
+plot3(xout,yout,zout,'b-','LineWidth',2)
+grid on
+xlabel('x-axis')
+ylabel('y-axis')
+zlabel('z-axis')
+hold on
+
+
+axis equal
+axis([-60 60 -60 60 -40 40])
+
+
+
+%definimos la tierra
+[x y z]= sphere
+r=Tierra.radio
+s=surf(r*x,r*y,r*z);
+direction=[1,0,0];
+rotate(s,direction,23.5)
+xlabel('x-axis')
+ylabel('y-axis')
+zlabel('z-axis')
+
+%definimos satelite 1
+[x1 y1 z1]= sphere
+r=2
+s1=surf(xout(1)+r*x1,yout(1)+r*y1,zout(1)+r*z1, 'FaceColor', [0.5 0.5 0.5]);
+%definimos satelite 2
+[x2 y2 z2]= sphere
+r2=2
+s2=surf(xout(68)+r2*x2,yout(68)+r2*y2,zout(68)+r2*z2, 'FaceColor', [0.5 0.5 0.5]);
+%definimos satelite 3
+[x3 y3 z3]= sphere
+r3=2
+s3=surf(xout(78)+r3*x2,yout(78)+r3*y2,zout(78)+r3*z2, 'FaceColor', [0.5 0.5 0.5]);
+%definimos satelite 4
+[x4 y4 z4]= sphere
+r4=2
+s4=surf(xout(88)+r4*x2,yout(88)+r4*y2,zout(88)+r4*z2, 'FaceColor', [0.5 0.5 0.5]);
+
+%for i=1:length(xout)
+%    s=surf(xout(i)+r*x,yout(i)+r*y,zout(i)+r*z);
+%    pause(.05)
+%end
+
+
+##### SOURCE END #####
+--></body></html>
